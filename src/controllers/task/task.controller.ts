@@ -1,14 +1,14 @@
 import { Request, Response } from "express";
-import { TaskRepository } from "@repositories/task/task.repository";
 import { TaskService } from "@services/task/task.service";
 import { Task } from "~/core/task";
 import { CreateTaskRequestDTOAdapter } from "~/adapters/request/task/createTaskRequestAdapter copy";
+import { UpdateTaskRequestAdapter } from "~/adapters/request/task/updateTaskRequestAdapter";
 
 export class TaskController {
     private readonly taskService: TaskService;
 
     constructor() {
-        this.taskService = new TaskService(new TaskRepository());
+        this.taskService = new TaskService();
     }
     
     async getAll(request: Request, response: Response): Promise<Response<Task[], Record<string, Task>>>{
@@ -24,10 +24,31 @@ export class TaskController {
     }
 
     async delete(request: Request, response: Response): Promise<void> {
-        const { taskId } = request.body;
+        const { taskId } = request.params;
         
-        await this.taskService.delete(taskId);
+        const result = await this.taskService.delete(Number(taskId));
+        
+        if(!result) {
+            response.status(422).send({ msg: 'ResourceError: Not found.'});
+            
+            return;
+        }
+        response.status(200).send();
+    }
+    
+    async update(request: Request, response: Response): Promise<void> {
+        const taskId = Number(request.params.taskId);
+        const hasNotTaskId = !Boolean(taskId);
+        
+        if(hasNotTaskId) {
+            response.status(403).send({ msg: 'ValidationError: not found task id.'});
+            return;
+        }
 
+        const updatedTask = UpdateTaskRequestAdapter.convert(request.body, taskId);
+            
+        await this.taskService.update(updatedTask);
+        
         response.status(200).send();
     }
 }

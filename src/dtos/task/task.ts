@@ -1,3 +1,5 @@
+import { StatusEnum } from "~/enum/task/status";
+
 export interface TaskProps {
     readonly id?: number;
     readonly title: string;
@@ -30,3 +32,24 @@ export class DeleteTaskRequestDTO extends TaskRequestDTO {
         super(props);
     }
 }
+
+interface UpdateTaskProps extends Partial<TaskProps> {
+    readonly finishAt: Date | undefined;
+ }
+
+export class UpdateTaskRequestDTO {
+    readonly id: number;
+    readonly title?: string;
+    readonly description?: string;
+    readonly status?: StatusEnum;
+    readonly finish_at?: Date | undefined;
+
+    constructor(props: Partial<UpdateTaskProps>, id: number) {
+        this.id = id;
+        this.title = props.title;
+        this.description = props.description;
+        this.finish_at = props.finishAt;
+    }
+}
+
+export interface UpdatedTask extends UpdateTaskRequestDTO {}
