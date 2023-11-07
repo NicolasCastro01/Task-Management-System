@@ -1,9 +1,9 @@
-import { TaskFromPrismaAdapter } from "~/adapters/request/task/taskFromPrismaAdapter";
 import { TaskRepository as TaskRepositoryContract } from "~/contracts/repositories/task/task.repository";
 import { Task } from "~/core/task";
-import { TaskProps } from "~/dtos/task/task";
+import { UpdatedTask } from "~/dtos/task/task";
+import { StatusEnum } from "~/enum/task/status";
 
-export class TaskRepository implements TaskRepositoryContract {
+export class TaskRepositoryMemo implements TaskRepositoryContract {
     constructor(
         private database: Task[] = []
     ) {}
@@ -12,12 +12,8 @@ export class TaskRepository implements TaskRepositoryContract {
         return this.database;
     }
     
-    async findById(taskId: Pick<TaskProps, "id">): Promise<Task> {
+    async findById(taskId: number): Promise<Task | undefined> {
         const task = this.database.find(taskPersist => taskPersist.id === taskId);
-        
-        if(!task) {
-            throw new Error('Task not found.');
-        }
         
         return task;
     }
@@ -29,5 +25,25 @@ export class TaskRepository implements TaskRepositoryContract {
     async delete(task: Task): Promise<void> {
         const databaseFiltered: Task[] = this.database.filter(taskPersist => taskPersist.id !== task.id);
         this.database = databaseFiltered;
+    }
+
+    async update(updatedTask: UpdatedTask): Promise<void>{
+        const task = this.database.filter(taskPersist => taskPersist.id === updatedTask.id);
+
+        if(!task) {
+            return;
+        }
+        
+        const databaseFiltered: Task[] = this.database.filter(taskPersist => taskPersist.id !== updatedTask.id);
+        const taskUpdated = Task.restore({
+            id: updatedTask.id,
+            title: updatedTask.title || '',
+            description: updatedTask.description || '',
+            status: updatedTask.status || StatusEnum.PENDING,
+            finishAt: updatedTask.finish_at || new Date()
+        });
+
+        this.database = databaseFiltered;
+        this.database.push(taskUpdated);
     }
 }

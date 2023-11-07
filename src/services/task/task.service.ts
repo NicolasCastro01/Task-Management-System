@@ -1,11 +1,11 @@
-import { TaskRepository } from "@repositories/task/task.repository";
+import { TaskRepositoryMemo } from "@repositories/task/task.repository";
 import { TaskService as TaskServiceContract } from "~/contracts/services/task/task.service";
 import { Task } from "~/core/task";
-import { CreateTaskRequestDTO, TaskProps } from "~/dtos/task/task";
+import { CreateTaskRequestDTO, UpdateTaskRequestDTO } from "~/dtos/task/task";
 
 export class TaskService implements TaskServiceContract {
     constructor(
-        private readonly taskRepository: TaskRepository
+        private readonly taskRepository: TaskRepositoryMemo = new TaskRepositoryMemo()
     ) { }
 
     async getAll(): Promise<Task[]> {
@@ -17,9 +17,18 @@ export class TaskService implements TaskServiceContract {
         await this.taskRepository.create(task);
     }
 
-    async delete(taskId: Pick<TaskProps, 'id'>): Promise<void> {
+    async delete(taskId: number): Promise<boolean> {
         const task = await this.taskRepository.findById(taskId);
-        
-        await this.taskRepository.delete(task);
+        if(task) {
+            await this.taskRepository.delete(task);
+            
+            return true;
+        }
+
+        return false;
+    }
+
+    async update(updatedTask: UpdateTaskRequestDTO): Promise<void> {
+        await this.taskRepository.update(updatedTask);
     }
 }
