@@ -11,6 +11,12 @@ export class TaskRepositoryMemo implements TaskRepositoryContract {
     async getAll(): Promise<Task[]> {
         return this.database;
     }
+
+    async getAllByStatus(status: StatusEnum): Promise<Task[]> {
+       const statusSelected = status.toString();
+        
+        return this.database.filter(taskPersist => taskPersist.status === statusSelected);
+    }
     
     async findById(taskId: number): Promise<Task | undefined> {
         const task = this.database.find(taskPersist => taskPersist.id === taskId);
