@@ -2,6 +2,7 @@ import { TaskRepositoryMemo } from "@repositories/task/task.repository";
 import { TaskService as TaskServiceContract } from "~/contracts/services/task/task.service";
 import { Task } from "~/core/task";
 import { CreateTaskRequestDTO, UpdateTaskRequestDTO } from "~/dtos/task/task";
+import { StatusEnum } from "~/enum/task/status";
 
 export class TaskService implements TaskServiceContract {
     constructor(
@@ -10,6 +11,10 @@ export class TaskService implements TaskServiceContract {
 
     async getAll(): Promise<Task[]> {
         return this.taskRepository.getAll();
+    }
+
+    async getAllByStatus(status: StatusEnum): Promise<Task[]> {
+        return this.taskRepository.getAllByStatus(status);
     }
 
     async create(createTaskRequestBody: CreateTaskRequestDTO): Promise<void> {
