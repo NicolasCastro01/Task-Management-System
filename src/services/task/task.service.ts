@@ -31,4 +31,8 @@ export class TaskService implements TaskServiceContract {
     async update(updatedTask: UpdateTaskRequestDTO): Promise<void> {
         await this.taskRepository.update(updatedTask);
     }
+
+    async complete(taskId: number): Promise<void> {
+        await this.taskRepository.complete(taskId);
+    }
 }

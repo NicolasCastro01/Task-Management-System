@@ -15,7 +15,7 @@ app.listen(port, () => {
 
 // [x] - Criar uma nova tarefa com um título, uma descrição e uma data de vencimento.
 // [x] - Listar todas as tarefas.
-// [] - Marcar uma tarefa como concluída.
+// [x] - Marcar uma tarefa como concluída.
 // [x] - Editar o título, descrição ou data de vencimento de uma tarefa.
 // [x] - Excluir uma tarefa.
 // [] - Filtrar tarefas por status (concluídas ou pendentes) ou por data de vencimento.
