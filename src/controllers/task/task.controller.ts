@@ -24,9 +24,9 @@ export class TaskController {
     }
 
     async delete(request: Request, response: Response): Promise<void> {
-        const { taskId } = request.params;
+        const taskId = this.getTaskIdFromParams(request);
         
-        const result = await this.taskService.delete(Number(taskId));
+        const result = await this.taskService.delete(taskId);
         
         if(!result) {
             response.status(422).send({ msg: 'ResourceError: Not found.'});
@@ -37,7 +37,7 @@ export class TaskController {
     }
     
     async update(request: Request, response: Response): Promise<void> {
-        const taskId = Number(request.params.taskId);
+        const taskId = this.getTaskIdFromParams(request);
         const hasNotTaskId = !Boolean(taskId);
         
         if(hasNotTaskId) {
@@ -50,5 +50,23 @@ export class TaskController {
         await this.taskService.update(updatedTask);
         
         response.status(200).send();
+    }
+
+    async complete(request: Request, response: Response): Promise<void> {
+        const taskId = this.getTaskIdFromParams(request);
+        const hasNotTaskId = !Boolean(taskId);
+        
+        if(hasNotTaskId) {
+            response.status(403).send({ msg: 'ValidationError: not found task id.'});
+            return;
+        }
+
+        await this.taskService.complete(taskId);
+
+        response.status(200).send();
+    }
+
+    private getTaskIdFromParams(request: Request): number {
+        return Number(request.params.taskId);
     }
 }
