@@ -28,7 +28,7 @@ export class TaskRepositoryMemo implements TaskRepositoryContract {
     }
 
     async update(updatedTask: UpdatedTask): Promise<void>{
-        const task = this.database.filter(taskPersist => taskPersist.id === updatedTask.id);
+        const task = this.database.filter(taskPersist => taskPersist.id === updatedTask.id)[0];
 
         if(!task) {
             return;
@@ -37,13 +37,28 @@ export class TaskRepositoryMemo implements TaskRepositoryContract {
         const databaseFiltered: Task[] = this.database.filter(taskPersist => taskPersist.id !== updatedTask.id);
         const taskUpdated = Task.restore({
             id: updatedTask.id,
-            title: updatedTask.title || '',
-            description: updatedTask.description || '',
-            status: updatedTask.status || StatusEnum.PENDING,
-            finishAt: updatedTask.finish_at || new Date()
+            title: updatedTask.title ? updatedTask.title : task.title,
+            description: updatedTask.description ? updatedTask.description : task.description,
+            status: updatedTask.status ? updatedTask.status : task.status,
+            finishAt: updatedTask.finish_at ? updatedTask.finish_at : task.finishAt
         });
 
         this.database = databaseFiltered;
         this.database.push(taskUpdated);
+    }
+
+    async complete(taskId: number): Promise<void> {
+        const task = this.database.filter(taskPersist => taskPersist.id === taskId)[0];
+
+        if(!task) {
+            return;
+        }
+
+        const databaseFiltered: Task[] = this.database.filter(taskPersist => taskPersist.id !== taskId);
+        
+        task.withStatus(StatusEnum.COMPLETED);
+
+        this.database = databaseFiltered;
+        this.database.push(task);
     }
 }
