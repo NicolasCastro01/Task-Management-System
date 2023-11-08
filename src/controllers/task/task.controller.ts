@@ -12,7 +12,27 @@ export class TaskController {
     }
     
     async getAll(request: Request, response: Response): Promise<Response<Task[], Record<string, Task>>>{
+        const filterStatus = request.query.status;
+        const hasFilterType = Boolean(filterStatus);
+        
+        if (hasFilterType) {
+            return await this.getAllByFilter(Object(filterStatus), response);
+        }
+
         const tasks = await this.taskService.getAll();
+        return response.status(200).send(tasks);
+    }
+
+    async getAllByFilter(statusChoosed: string, response: Response): Promise<Response<Task[], Record<string, Task>>> {
+        const status = statusChoosed.toString();
+        
+        const hasNotFilterType = !Boolean(status);
+
+        if(hasNotFilterType) {
+            return response.status(403).send({ msg: "ValidationError: not found filter type." });
+        }
+
+        const tasks = await this.taskService.getAllByStatus(Object(status));
         return response.status(200).send(tasks);
     }
 
