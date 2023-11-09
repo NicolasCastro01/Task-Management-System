@@ -12,27 +12,29 @@ export class TaskController {
     }
     
     async getAll(request: Request, response: Response): Promise<Response<Task[], Record<string, Task>>>{
-        const filterStatus = request.query.status;
-        const hasFilterType = Boolean(filterStatus);
-        
-        if (hasFilterType) {
-            return await this.getAllByFilter(Object(filterStatus), response);
-        }
-
         const tasks = await this.taskService.getAll();
         return response.status(200).send(tasks);
     }
 
-    async getAllByFilter(statusChoosed: string, response: Response): Promise<Response<Task[], Record<string, Task>>> {
-        const status = statusChoosed.toString();
+    async getAllByFilter(request: Request, response: Response): Promise<Response<Task[], Record<string, Task>>> {
+        const queryFilterType = request.query.filterBy;
+        const hasNotFilterType = !queryFilterType;
         
-        const hasNotFilterType = !Boolean(status);
-
-        if(hasNotFilterType) {
-            return response.status(403).send({ msg: "ValidationError: not found filter type." });
+        if (hasNotFilterType) {
+            return response.status(403).send({ msg: "ValidationError: not found filter" })
         }
 
-        const tasks = await this.taskService.getAllByStatus(Object(status));
+        const queryFilterValue = request.query.filterValue;
+        const hasNotFilterValue = !queryFilterValue;
+        
+        if (hasNotFilterValue) {
+            return response.status(403).send({ msg: "ValidationError: not found filter" })
+        }
+        
+        const filterType = queryFilterType.toString();
+        const filterValue = queryFilterValue.toString();
+
+        const tasks = await this.taskService.getAllByFilter(Object(filterType), Object(filterValue));
         return response.status(200).send(tasks);
     }
 
