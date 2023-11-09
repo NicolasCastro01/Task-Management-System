@@ -18,4 +18,5 @@ app.listen(port, () => {
 // [x] - Marcar uma tarefa como concluída.
 // [x] - Editar o título, descrição ou data de vencimento de uma tarefa.
 // [x] - Excluir uma tarefa.
-// [x] - Filtrar tarefas por status (concluídas ou pendentes) ou por data de vencimento.
+// [x] - Filtrar tarefas por status (concluídas ou pendentes).
+// [x] - Filtrar tarefas por data de vencimento.
