@@ -1,10 +1,10 @@
 import { Task } from "~/core/task";
 import { UpdatedTask } from "~/dtos/task/task";
-import { StatusEnum } from "~/enum/task/status";
+import { FiltersEnum } from "~/enum/task/filters";
 
 export interface TaskRepository {
     getAll(): Promise<Task[]>;
-    getAllByStatus(status: StatusEnum): Promise<Task[]>;
+    getAllByFilter(filter: FiltersEnum, value: string): Promise<Task[]>;
     findById(taskId: number): Promise<Task | undefined>;
     create(task: Task): Promise<void>;
     delete(task: Task): Promise<void>;

@@ -1,6 +1,7 @@
 import { TaskRepository as TaskRepositoryContract } from "~/contracts/repositories/task/task.repository";
 import { Task } from "~/core/task";
 import { UpdatedTask } from "~/dtos/task/task";
+import { FiltersEnum } from "~/enum/task/filters";
 import { StatusEnum } from "~/enum/task/status";
 
 export class TaskRepositoryMemo implements TaskRepositoryContract {
@@ -12,12 +13,17 @@ export class TaskRepositoryMemo implements TaskRepositoryContract {
         return this.database;
     }
 
-    async getAllByStatus(status: StatusEnum): Promise<Task[]> {
-       const statusSelected = status.toString();
+    async getAllByFilter(filter: FiltersEnum, value: string): Promise<Task[]> {
+        const filterTypeSelected = filter.toString() as keyof typeof FiltersEnum;
+        const filterValueSelected = value.toString();
         
-        return this.database.filter(taskPersist => taskPersist.status === statusSelected);
+        if(filter == 'status') {
+            return this.database.filter(taskPersist => taskPersist[filterTypeSelected].toString() === filterValueSelected);
+        }
+        
+        return this.database.filter(taskPersist => new Date(taskPersist[filterTypeSelected]).toISOString() === filterValueSelected);
     }
-    
+
     async findById(taskId: number): Promise<Task | undefined> {
         const task = this.database.find(taskPersist => taskPersist.id === taskId);
         
