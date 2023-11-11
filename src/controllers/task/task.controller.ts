@@ -1,15 +1,13 @@
 import { Request, Response } from "express";
 import { TaskService } from "@services/task/task.service";
 import { Task } from "~/core/task";
-import { CreateTaskRequestDTOAdapter } from "~/adapters/request/task/createTaskRequestAdapter copy";
+import { CreateTaskRequestDTOAdapter } from "~/adapters/request/task/createTaskRequestAdapter";
 import { UpdateTaskRequestAdapter } from "~/adapters/request/task/updateTaskRequestAdapter";
 
 export class TaskController {
-    private readonly taskService: TaskService;
-
-    constructor() {
-        this.taskService = new TaskService();
-    }
+    constructor(
+        private readonly taskService: TaskService
+    ) { }
     
     async getAll(request: Request, response: Response): Promise<Response<Task[], Record<string, Task>>>{
         const tasks = await this.taskService.getAll();
