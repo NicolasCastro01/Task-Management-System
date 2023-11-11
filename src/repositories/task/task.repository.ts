@@ -2,75 +2,113 @@ import { TaskRepository as TaskRepositoryContract } from "~/contracts/repositori
 import { Task } from "~/core/task";
 import { UpdatedTask } from "~/dtos/task/task";
 import { FiltersEnum } from "~/enum/task/filters";
-import { StatusEnum } from "~/enum/task/status";
+import { PrismaClient } from "@prisma/client";
+import { TaskFromPrismaAdapter } from "~/adapters/request/task/taskFromPrismaAdapter";
 
-export class TaskRepositoryMemo implements TaskRepositoryContract {
-    constructor(
-        private database: Task[] = []
-    ) {}
-    
-    async getAll(): Promise<Task[]> {
-        return this.database;
+export class TaskRepository implements TaskRepositoryContract {
+  constructor(
+    private readonly database: PrismaClient
+  ) { }
+
+  async getAll(): Promise<Task[]> {
+    const tasks = await this.database.task.findMany({
+      include: {
+        status: true
+      }
+    });
+
+    return tasks.map(TaskFromPrismaAdapter.convert);
+  }
+
+  async getAllByFilter(filter: FiltersEnum, value: string | number): Promise<Task[]> {
+    const isDate = FiltersEnum[filter] === FiltersEnum.finishAt;
+    const valueParsed = value.toString();
+
+    const tasks = await this.database.task.findMany({
+      where: {
+        OR: [
+          {
+            statusId: isDate ? 0 : Number(valueParsed)
+          },
+          {
+            finishAt: isDate ? new Date(valueParsed) : new Date()
+          }
+        ]
+      },
+      include: {
+        status: true
+      }
+    });
+
+    return tasks.map(TaskFromPrismaAdapter.convert);
+  }
+
+  async findById(taskId: number): Promise<Task> {
+    const task = await this.database.task.findUnique({
+      where: { id: taskId },
+      include: {
+        status: true
+      }
+    });
+
+    if(!task) {
+      throw new Error('Task not found.')
     }
 
-    async getAllByFilter(filter: FiltersEnum, value: string): Promise<Task[]> {
-        const filterTypeSelected = filter.toString() as keyof typeof FiltersEnum;
-        const filterValueSelected = value.toString();
-        
-        if(filter == 'status') {
-            return this.database.filter(taskPersist => taskPersist[filterTypeSelected].toString() === filterValueSelected);
+    return TaskFromPrismaAdapter.convert(task);
+  }
+
+  async create({ title, description, status, finishAt }: Task): Promise<Task> {
+    const taskCreated = await this.database.task.create({
+      data: {
+        title,
+        description,
+        status: {
+          connect: {
+            id: status._id
+          }
+        },
+        finishAt
+      },
+      include: {
+        status: true
+      }
+    });
+
+    return TaskFromPrismaAdapter.convert(taskCreated);
+  }
+
+  async delete({ id }: Task): Promise<void> {
+    await this.database.task.delete({
+      where: { id }
+    });
+  }
+
+  async update(updatedTask: UpdatedTask): Promise<void> {
+    await this.database.task.update({
+      data: {
+        title: updatedTask.title,
+        description: updatedTask.description,
+        finishAt: updatedTask.finish_at
+      },
+      where: {
+        id: updatedTask.id
+      }
+    });
+  }
+
+  async complete(taskId: number): Promise<void> {
+    await this.database.task.update({
+      data: {
+        status: {
+          connect: {
+            id: 2
+          }
         }
-        
-        return this.database.filter(taskPersist => new Date(taskPersist[filterTypeSelected]).toISOString() === filterValueSelected);
-    }
-
-    async findById(taskId: number): Promise<Task | undefined> {
-        const task = this.database.find(taskPersist => taskPersist.id === taskId);
-        
-        return task;
-    }
-    
-    async create(task: Task): Promise<void> {
-        this.database.push(task);
-    }
-
-    async delete(task: Task): Promise<void> {
-        const databaseFiltered: Task[] = this.database.filter(taskPersist => taskPersist.id !== task.id);
-        this.database = databaseFiltered;
-    }
-
-    async update(updatedTask: UpdatedTask): Promise<void>{
-        const task = this.database.filter(taskPersist => taskPersist.id === updatedTask.id)[0];
-
-        if(!task) {
-            return;
-        }
-        
-        const databaseFiltered: Task[] = this.database.filter(taskPersist => taskPersist.id !== updatedTask.id);
-        const taskUpdated = Task.restore({
-            id: updatedTask.id,
-            title: updatedTask.title ? updatedTask.title : task.title,
-            description: updatedTask.description ? updatedTask.description : task.description,
-            status: updatedTask.status ? updatedTask.status : task.status,
-            finishAt: updatedTask.finish_at ? updatedTask.finish_at : task.finishAt
-        });
-
-        this.database = databaseFiltered;
-        this.database.push(taskUpdated);
-    }
-
-    async complete(taskId: number): Promise<void> {
-        const task = this.database.filter(taskPersist => taskPersist.id === taskId)[0];
-
-        if(!task) {
-            return;
-        }
-
-        const databaseFiltered: Task[] = this.database.filter(taskPersist => taskPersist.id !== taskId);
-        
-        task.withStatus(StatusEnum.COMPLETED);
-
-        this.database = databaseFiltered;
-        this.database.push(task);
-    }
+      },
+      where: {
+        id: taskId
+      }
+    });
+  }
 }
