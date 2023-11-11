@@ -1,9 +1,17 @@
 import { Request, Response } from "express";
 import { TaskController } from "@controllers/task/task.controller";
+import { TaskService } from "~/services/task/task.service";
+import { TaskRepository } from "~/repositories/task/task.repository";
+import { PrismaClient } from "@prisma/client";
 
 const express = require("express");
 const router = express.Router();
-const taskController = new TaskController();
+
+const database = new PrismaClient();
+
+const taskRepository = new TaskRepository(database);
+const taskService = new TaskService(taskRepository);
+const taskController = new TaskController(taskService);
 
 router.get('/api/tasks', async (request: Request, response: Response) => taskController.getAll(request, response));
 router.get('/api/tasks/list', async (request: Request, response: Response) => taskController.getAllByFilter(request, response));
