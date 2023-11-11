@@ -1,40 +1,52 @@
 import { StatusEnum } from "~/enum/task/status";
+import { Status } from "./status";
 
 interface TaskProps {
     id: number;
     title: string;
     description: string;
-    status?: StatusEnum;
+    status: Status;
     finishAt: Date;
 }
 
-type CreateTaskProps = Omit<TaskProps, 'id'>;
+interface CreateTaskProps extends Omit<TaskProps, 'id' | 'status'> {}
+interface RestoreTaskProps extends TaskProps { }
 
 export class Task {
     private _id?: number;
     private _title: string;
     private _description: string;
-    private _status: StatusEnum;
+    private _status: Status;
     private _finish_at: Date;
 
     private constructor(props: Omit<TaskProps, 'id'>, id?: number) {
-        this._id = id || Math.floor(Math.random() * 100000000);
+        this._id = id;
         this._title = props.title;
         this._description = props.description,
-        this._status = props.status || StatusEnum.PENDING;
+        this._status = props.status;
         this._finish_at = props.finishAt;
     }
 
-    static create(props: CreateTaskProps): Task {
-        return new Task(props);
+    static create({ title, description, finishAt }: CreateTaskProps): Task {
+        return new Task({
+            title,
+            description,
+            status: Status.restore({ description: StatusEnum.PENDING }, 1),
+            finishAt
+        });
     }
 
-    static restore(props: TaskProps): Task {
-        return new Task(props, props.id);
+    static restore({ id, title, description, status, finishAt }: RestoreTaskProps): Task {
+        return new Task({
+            title,
+            description,
+            status: Status.restore({ description: status._props.description }, status._id),
+            finishAt
+        }, id);
     }
 
-    get id(): Number | undefined {
-        return this._id;
+    get id(): number {
+        return Number(this._id);
     }
 
     get title(): string {
@@ -49,15 +61,15 @@ export class Task {
         return this._finish_at;
     }
 
-    get status(): StatusEnum {
+    get status(): Status {
         return this._status;
     }
 
-    withStatus(status: StatusEnum) {
+    withStatus(status: Status) {
         this.changeStatus(status);
     }
 
-    private changeStatus(status: StatusEnum) {
-        this._status = status;
+    private changeStatus(status: Status) {
+        this._status = Status.restore({ description: status._props.description }, status._id);
     }
 }
