@@ -1,4 +1,4 @@
-import { TaskRepositoryMemo } from "@repositories/task/task.repository";
+import { TaskRepository } from "@repositories/task/task.repository";
 import { TaskService as TaskServiceContract } from "~/contracts/services/task/task.service";
 import { Task } from "~/core/task";
 import { CreateTaskRequestDTO, UpdateTaskRequestDTO } from "~/dtos/task/task";
@@ -6,11 +6,15 @@ import { FiltersEnum } from "~/enum/task/filters";
 
 export class TaskService implements TaskServiceContract {
     constructor(
-        private readonly taskRepository: TaskRepositoryMemo = new TaskRepositoryMemo()
+        private readonly taskRepository: TaskRepository
     ) { }
 
     async getAll(): Promise<Task[]> {
         return this.taskRepository.getAll();
+    }
+
+    async findById(taskId: number): Promise<Task> {
+        return this.taskRepository.findById(taskId);
     }
 
     async getAllByFilter(filter: FiltersEnum, value: string): Promise<Task[]> {
@@ -34,7 +38,16 @@ export class TaskService implements TaskServiceContract {
     }
 
     async update(updatedTask: UpdateTaskRequestDTO): Promise<void> {
-        await this.taskRepository.update(updatedTask);
+        const task = await this.findById(updatedTask.id);
+        const taskUpdated = Task.restore({
+            id: task.id,
+            title: updatedTask.title || task.title,
+            description: updatedTask.description || task.description,
+            status: task.status,
+            finishAt: updatedTask.finish_at || task.finishAt
+        });
+
+        await this.taskRepository.update(taskUpdated);
     }
 
     async complete(taskId: number): Promise<void> {

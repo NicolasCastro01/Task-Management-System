@@ -11,19 +11,29 @@ datasource db {
 }
 
 model Task {
-  id Int @unique @default(autoincrement())
-  title String
+  id          Int      @unique @default(autoincrement())
+  title       String
   description String
-  status StatusEnum
-  finishAt DateTime @map("finish_at") @db.Timestamptz(6)
-  createdAt DateTime @map("created_at") @db.Timestamptz(6)
-  updatedAt DateTime @map("updated_at") @db.Timestamptz(6)
-  deletedAt DateTime @map("deleted_at") @db.Timestamptz(6)
+  status    Status   @relation(fields: [statusId], references: [id])
+  statusId    Int @map("status_id")
+  finishAt    DateTime @map("finish_at") @db.Timestamptz(6)
+  
+  createdAt   DateTime @map("created_at") @default(now()) @db.Timestamptz(6)
+  updatedAt   DateTime @map("updated_at") @default(now()) @updatedAt @db.Timestamptz(6)
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(6)
 
   @@map("task")
 }
 
-enum StatusEnum {
-  completed
-  pending
+model Status {
+  id   Int    @unique @default(autoincrement())
+  description String
+
+  Task Task[]
+
+  createdAt   DateTime @map("created_at") @default(now()) @db.Timestamptz(6)
+  updatedAt   DateTime @map("updated_at") @default(now()) @updatedAt @db.Timestamptz(6)
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(6)
+
+  @@map("status")
 }
