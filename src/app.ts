@@ -20,3 +20,7 @@ app.listen(port, () => {
 // [x] - Excluir uma tarefa.
 // [x] - Filtrar tarefas por status (concluídas ou pendentes).
 // [x] - Filtrar tarefas por data de vencimento.
+
+// [x] - Implementar o Prisma.
+// [x] - Banco de dados postgres.
+// [x] - Modelar a tarefa para o banco.

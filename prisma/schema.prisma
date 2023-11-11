@@ -1,0 +1,29 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Task {
+  id Int @unique @default(autoincrement())
+  title String
+  description String
+  status StatusEnum
+  finishAt DateTime @map("finish_at") @db.Timestamptz(6)
+  createdAt DateTime @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @map("updated_at") @db.Timestamptz(6)
+  deletedAt DateTime @map("deleted_at") @db.Timestamptz(6)
+
+  @@map("task")
+}
+
+enum StatusEnum {
+  completed
+  pending
+}
