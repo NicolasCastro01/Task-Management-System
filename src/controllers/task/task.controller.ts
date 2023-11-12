@@ -33,14 +33,15 @@ export class TaskController {
         const filterValue = queryFilterValue.toString();
 
         const tasks = await this.taskService.getAllByFilter(Object(filterType), Object(filterValue));
+        
         return response.status(200).send(tasks);
     }
 
     async create(request: Request, response: Response): Promise<void> {
         const createTaskDTO = CreateTaskRequestDTOAdapter.convert(request.body);
-        await this.taskService.create(createTaskDTO)
+        const createdTask = await this.taskService.create(createTaskDTO)
 
-        response.status(201).send();
+        response.status(201).send(createdTask);
     }
 
     async delete(request: Request, response: Response): Promise<void> {
