@@ -1,29 +1,29 @@
-interface StatusProps {
+type StatusProps = {
     description: string;
 }
 
-interface CreateStatusProps extends Omit<StatusProps, 'id'>{ };
-interface RestoreStatusProps extends StatusProps {};
+type CreateStatusProps = StatusProps;
+type RestoreStatusProps = StatusProps;
 
 export class Status {
     private readonly id?: number;
-    protected props: StatusProps;
+    protected description: string;
 
-    private constructor(props: Omit<StatusProps, 'id'>, id?: number) {
-        this.props = props;
+    private constructor(description: string, id?: number) {
+        this.description = description;
         this.id = id;
     }
     
-    static create(props: CreateStatusProps): Status {
-        return new Status(props);
+    static create({ description }: CreateStatusProps): Status {
+        return new Status(description);
     }
 
-    static restore(props: RestoreStatusProps, id: number): Status {
-        return new Status(props, id);
+    static restore({ description }: RestoreStatusProps, id: number): Status {
+        return new Status(description, id);
     }
 
-    get _props(): StatusProps {
-        return this.props;
+    get _description(): string {
+        return this.description;
     }
 
     get _id(): number {
