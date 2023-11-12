@@ -21,9 +21,10 @@ export class TaskService implements TaskServiceContract {
         return this.taskRepository.getAllByFilter(filter, value);
     }
 
-    async create(createTaskRequestBody: CreateTaskRequestDTO): Promise<void> {
+    async create(createTaskRequestBody: CreateTaskRequestDTO): Promise<Task> {
         const task = Task.create(createTaskRequestBody);
-        await this.taskRepository.create(task);
+
+        return this.taskRepository.create(task);
     }
 
     async delete(taskId: number): Promise<boolean> {
