@@ -3,7 +3,7 @@ import { Task } from "~/core/task";
 import { UpdatedTask } from "~/dtos/task/task";
 import { FiltersEnum } from "~/enum/task/filters";
 import { PrismaClient } from "@prisma/client";
-import { TaskFromPrismaAdapter } from "~/adapters/request/task/taskFromPrismaAdapter";
+import { TaskFromPrismaAdapter } from "~/adapters/prisma/task/taskFromPrismaAdapter";
 
 export class TaskRepository implements TaskRepositoryContract {
   constructor(
