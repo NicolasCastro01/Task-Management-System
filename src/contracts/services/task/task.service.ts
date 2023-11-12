@@ -6,7 +6,7 @@ export interface TaskService {
     getAll(): Promise<Task[]>;
     findById(taskId: number): Promise<Task>;
     getAllByFilter(filter: FiltersEnum, value: string): Promise<Task[]>;
-    create(createTaskRequestBody: CreateTaskRequestDTO): Promise<void>;
+    create(createTaskRequestBody: CreateTaskRequestDTO): Promise<Task>;
     delete(taskId: number): Promise<boolean>;
     update(updatedTask: UpdateTaskRequestDTO): Promise<void>;
     complete(taskId: number): Promise<void>;
