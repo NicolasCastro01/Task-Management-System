@@ -41,14 +41,14 @@ export class TaskService implements TaskServiceContract {
     async update(updatedTask: UpdateTaskRequestDTO): Promise<void> {
         const task = await this.findById(updatedTask.id);
         const taskUpdated = Task.restore({
-            id: task.id,
+            id: task._id,
             title: updatedTask.title || task.title,
             description: updatedTask.description || task.description,
-            status: task.status,
+            status: task._status,
             finishAt: updatedTask.finish_at || task.finishAt
         });
 
-        await this.taskRepository.update(taskUpdated);
+        await this.taskRepository.update(taskUpdated, task._id);
     }
 
     async complete(taskId: number): Promise<void> {

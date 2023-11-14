@@ -8,6 +8,6 @@ export interface TaskRepository {
     findById(taskId: number): Promise<Task | undefined>;
     create(task: Task): Promise<Task>;
     delete(task: Task): Promise<void>;
-    update(updatedTask: UpdatedTask): Promise<void>;
+    update(updatedTask: UpdatedTask, taskId: number): Promise<void>;
     complete(taskId: number): Promise<void>;
 }

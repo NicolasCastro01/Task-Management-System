@@ -58,14 +58,14 @@ export class TaskRepository implements TaskRepositoryContract {
     return TaskFromPrismaAdapter.convert(task);
   }
 
-  async create({ title, description, status, finishAt }: Task): Promise<Task> {
+  async create({ title, description, _status, finishAt }: Task): Promise<Task> {
     const taskCreated = await this.database.task.create({
       data: {
         title,
         description,
         status: {
           connect: {
-            id: status._id
+            id: _status._id
           }
         },
         finishAt
@@ -78,13 +78,13 @@ export class TaskRepository implements TaskRepositoryContract {
     return TaskFromPrismaAdapter.convert(taskCreated);
   }
 
-  async delete({ id }: Task): Promise<void> {
+  async delete({ _id }: Task): Promise<void> {
     await this.database.task.delete({
-      where: { id }
+      where: { id: _id }
     });
   }
 
-  async update(updatedTask: UpdatedTask): Promise<void> {
+  async update(updatedTask: Omit<UpdatedTask, 'id'>, taskId: number): Promise<void> {
     await this.database.task.update({
       data: {
         title: updatedTask.title,
@@ -92,7 +92,7 @@ export class TaskRepository implements TaskRepositoryContract {
         finishAt: updatedTask.finish_at
       },
       where: {
-        id: updatedTask.id
+        id: taskId
       }
     });
   }
