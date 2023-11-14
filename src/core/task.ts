@@ -1,8 +1,8 @@
 import { StatusEnum } from "~/enum/task/status";
 import { Status } from "./status";
+import { Entity } from "~/common/core/entity/entity";
 
 interface TaskProps {
-    id: number;
     title: string;
     description: string;
     status: Status;
@@ -10,21 +10,16 @@ interface TaskProps {
 }
 
 interface CreateTaskProps extends Omit<TaskProps, 'id' | 'status'> {}
-interface RestoreTaskProps extends TaskProps { }
+interface RestoreTaskProps extends TaskProps {
+    id: number;
+ }
 
-export class Task {
+export class Task extends Entity<TaskProps> {
     private readonly id?: number;
-    private readonly title: string;
-    private readonly description: string;
-    private status: Status;
-    private readonly finish_at: Date;
 
-    private constructor(props: Omit<TaskProps, 'id'>, id?: number) {
+    private constructor(props: TaskProps, id?: number) {
+        super(props);
         this.id = id;
-        this.title = props.title;
-        this.description = props.description,
-        this.status = props.status;
-        this.finish_at = props.finishAt;
     }
 
     static create({ title, description, finishAt }: CreateTaskProps): Task {
@@ -40,7 +35,7 @@ export class Task {
         return new Task({
             title,
             description,
-            status: Status.restore({ description: status._description }, status._id),
+            status: Status.restore({ description: status._props.description }, status._id),
             finishAt
         }, id);
     }
@@ -49,20 +44,20 @@ export class Task {
         return Number(this.id);
     }
 
-    get _title(): string {
-        return this.title;
+    get title(): string {
+        return this.props.title;
     }
 
-    get _description(): string {
-        return this.description;
+    get description(): string {
+        return this.props.description;
     }
 
-    get _finishAt(): Date {
-        return this.finish_at;
+    get finishAt(): Date {
+        return this.props.finishAt;
     }
 
     get _status(): Status {
-        return this.status;
+        return this.props.status;
     }
 
     withStatus(status: Status) {
@@ -70,6 +65,6 @@ export class Task {
     }
 
     private changeStatus(status: Status) {
-        this.status = Status.restore({ description: status._description }, status._id);
+        this.props.status = Status.restore({ description: status._props.description }, status._id);
     }
 }

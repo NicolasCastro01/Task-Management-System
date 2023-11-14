@@ -1,3 +1,5 @@
+import { Entity } from "~/common/core/entity/entity";
+
 type StatusProps = {
     description: string;
 }
@@ -5,27 +7,22 @@ type StatusProps = {
 type CreateStatusProps = StatusProps;
 type RestoreStatusProps = StatusProps;
 
-export class Status {
+export class Status extends Entity<StatusProps> {
     private readonly id?: number;
-    protected description: string;
 
-    private constructor(description: string, id?: number) {
-        this.description = description;
+    private constructor(props: StatusProps, id?: number) {
+        super(props);
         this.id = id;
     }
     
-    static create({ description }: CreateStatusProps): Status {
-        return new Status(description);
+    static create(props: CreateStatusProps): Status {
+        return new Status(props);
     }
 
-    static restore({ description }: RestoreStatusProps, id: number): Status {
-        return new Status(description, id);
+    static restore(props: RestoreStatusProps, id: number): Status {
+        return new Status(props, id);
     }
-
-    get _description(): string {
-        return this.description;
-    }
-
+    
     get _id(): number {
         return Number(this.id);
     }
