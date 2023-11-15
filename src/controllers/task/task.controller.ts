@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import { TaskService } from "@services/task/task.service";
 import { Task } from "~/core/task";
 import { CreateTaskRequestDTOAdapter } from "~/adapters/request/task/createTaskRequestAdapter";
 import { UpdateTaskRequestAdapter } from "~/adapters/request/task/updateTaskRequestAdapter";
+import { TaskService } from "~/contracts/services/task/task.service";
 
 export class TaskController {
     constructor(

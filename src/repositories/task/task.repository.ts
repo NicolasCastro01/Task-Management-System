@@ -1,6 +1,5 @@
 import { TaskRepository as TaskRepositoryContract } from "~/contracts/repositories/task/task.repository";
 import { Task } from "~/core/task";
-import { UpdatedTask } from "~/dtos/task/task";
 import { FiltersEnum } from "~/enum/task/filters";
 import { PrismaClient } from "@prisma/client";
 import { TaskFromPrismaAdapter } from "~/adapters/prisma/task/taskFromPrismaAdapter";
@@ -84,12 +83,12 @@ export class TaskRepository implements TaskRepositoryContract {
     });
   }
 
-  async update(updatedTask: Omit<UpdatedTask, 'id'>, taskId: number): Promise<void> {
+  async update(updatedTask: Task, taskId: number): Promise<void> {
     await this.database.task.update({
       data: {
         title: updatedTask.title,
         description: updatedTask.description,
-        finishAt: updatedTask.finish_at
+        finishAt: updatedTask.finishAt
       },
       where: {
         id: taskId
