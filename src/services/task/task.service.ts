@@ -1,4 +1,4 @@
-import { TaskRepository } from "@repositories/task/task.repository";
+import { TaskRepository } from "~/contracts/repositories/task/task.repository";
 import { TaskService as TaskServiceContract } from "~/contracts/services/task/task.service";
 import { Task } from "~/core/task";
 import { CreateTaskRequestDTO, UpdateTaskRequestDTO } from "~/dtos/task/task";

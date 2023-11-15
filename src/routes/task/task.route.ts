@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
+import { PrismaClient } from "@prisma/client";
 import { TaskController } from "@controllers/task/task.controller";
 import { TaskService } from "~/services/task/task.service";
 import { TaskRepository } from "~/repositories/task/task.repository";
-import { PrismaClient } from "@prisma/client";
 
 const express = require("express");
 const router = express.Router();
