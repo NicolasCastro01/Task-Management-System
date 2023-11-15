@@ -3,6 +3,7 @@ import { Task } from "~/core/task";
 import { CreateTaskRequestDTOAdapter } from "~/adapters/request/task/createTaskRequestAdapter";
 import { UpdateTaskRequestAdapter } from "~/adapters/request/task/updateTaskRequestAdapter";
 import { TaskService } from "~/contracts/services/task/task.service";
+import { ValidationException } from "~/exception/ValidationException";
 
 export class TaskController {
     constructor(
@@ -19,14 +20,14 @@ export class TaskController {
         const hasNotFilterType = !queryFilterType;
         
         if (hasNotFilterType) {
-            return response.status(403).send({ msg: "ValidationError: not found filter" })
+            throw ValidationException.invalid({ field: 'filter', rule: 'empty' });
         }
 
         const queryFilterValue = request.query.filterValue;
         const hasNotFilterValue = !queryFilterValue;
         
         if (hasNotFilterValue) {
-            return response.status(403).send({ msg: "ValidationError: not found filter" })
+            throw ValidationException.invalid({ field: 'filterValue', rule: 'empty' });
         }
         
         const filterType = queryFilterType.toString();
@@ -47,13 +48,8 @@ export class TaskController {
     async delete(request: Request, response: Response): Promise<void> {
         const taskId = this.getTaskIdFromParams(request);
         
-        const result = await this.taskService.delete(taskId);
+        await this.taskService.delete(taskId);
         
-        if(!result) {
-            response.status(422).send({ msg: 'ResourceError: Not found.'});
-            
-            return;
-        }
         response.status(200).send();
     }
     
@@ -62,8 +58,7 @@ export class TaskController {
         const hasNotTaskId = !Boolean(taskId);
         
         if(hasNotTaskId) {
-            response.status(403).send({ msg: 'ValidationError: not found task id.'});
-            return;
+            throw ValidationException.invalid({ field: "taskId", rule: "empty" });
         }
 
         const updatedTask = UpdateTaskRequestAdapter.convert(request.body, taskId);
@@ -78,8 +73,7 @@ export class TaskController {
         const hasNotTaskId = !Boolean(taskId);
         
         if(hasNotTaskId) {
-            response.status(403).send({ msg: 'ValidationError: not found task id.'});
-            return;
+            throw ValidationException.invalid({ field: "taskId", rule: "empty" });
         }
 
         await this.taskService.complete(taskId);

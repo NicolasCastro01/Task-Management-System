@@ -3,6 +3,7 @@ import { Task } from "~/core/task";
 import { FiltersEnum } from "~/enum/task/filters";
 import { PrismaClient } from "@prisma/client";
 import { TaskFromPrismaAdapter } from "~/adapters/prisma/task/taskFromPrismaAdapter";
+import { ResourceException } from "~/exception/ResourceException";
 
 export class TaskRepository implements TaskRepositoryContract {
   constructor(
@@ -51,7 +52,7 @@ export class TaskRepository implements TaskRepositoryContract {
     });
 
     if(!task) {
-      throw new Error('Task not found.')
+      throw ResourceException.notFound({ field: 'task' });
     }
 
     return TaskFromPrismaAdapter.convert(task);
