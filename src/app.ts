@@ -18,6 +18,6 @@ app.listen(port, () => {
 });
 
 // Authentication
-// [] - Modelar usuário no prisma
+// [x] - Modelar usuário no prisma
 // [] - Criar sistema de cadastro
 // [] - Criar sistema de login
