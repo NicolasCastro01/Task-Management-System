@@ -1,4 +1,5 @@
 import { TaskRepository } from "~/contracts/repositories/task/task.repository";
+import { UserRepository } from "~/contracts/repositories/user/user.repository";
 import { TaskService as TaskServiceContract } from "~/contracts/services/task/task.service";
 import { Task } from "~/core/task";
 import { CreateTaskRequestDTO, UpdateTaskRequestDTO } from "~/dtos/task/task";
@@ -6,7 +7,8 @@ import { FiltersEnum } from "~/enum/task/filters";
 
 export class TaskService implements TaskServiceContract {
     constructor(
-        private readonly taskRepository: TaskRepository
+        private readonly taskRepository: TaskRepository,
+        private readonly userRepository: UserRepository
     ) { }
 
     async getAll(): Promise<Task[]> {
@@ -22,6 +24,8 @@ export class TaskService implements TaskServiceContract {
     }
 
     async create(createTaskRequestBody: CreateTaskRequestDTO): Promise<Task> {
+        await this.userRepository.findById(createTaskRequestBody.userRef);
+        
         const task = Task.create(createTaskRequestBody);
 
         return this.taskRepository.create(task);

@@ -4,6 +4,7 @@ export interface TaskProps {
     readonly description: string;
     readonly statusId?: number;
     readonly finishAt: Date;
+    readonly userRef: number;
 }
 
 export class TaskRequestDTO {
@@ -12,6 +13,7 @@ export class TaskRequestDTO {
     readonly description: string;
     readonly statusId?: number;
     readonly finishAt: Date;
+    readonly userRef: number;
 
     constructor(props: TaskProps) {
         this.id = props.id;
@@ -19,6 +21,7 @@ export class TaskRequestDTO {
         this.description = props.description;
         this.statusId = props.statusId;
         this.finishAt = props.finishAt;
+        this.userRef = props.userRef;
     }
 }
 

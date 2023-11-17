@@ -1,6 +1,6 @@
-import { Request, Response } from "express";
+import { Request, Response, response } from "express";
 import { Task } from "~/core/task";
-import { CreateTaskRequestDTOAdapter } from "~/adapters/request/task/createTaskRequestAdapter";
+import { CreateTaskRequestBody, CreateTaskRequestDTOAdapter } from "~/adapters/request/task/createTaskRequestAdapter";
 import { UpdateTaskRequestAdapter } from "~/adapters/request/task/updateTaskRequestAdapter";
 import { TaskService } from "~/contracts/services/task/task.service";
 import { ValidationException } from "~/exception/ValidationException";
@@ -9,6 +9,12 @@ export class TaskController {
     constructor(
         private readonly taskService: TaskService
     ) { }
+
+    async getById(request: Request, response: Response): Promise<Response<Task, Record<string, Task>>> {
+        const taskId = Number(request.params.taskId) as number; 
+        const task = await this.taskService.findById(taskId);
+        return  response.status(200).send(task);
+    }
     
     async getAll(request: Request, response: Response): Promise<Response<Task[], Record<string, Task>>>{
         const tasks = await this.taskService.getAll();
@@ -39,7 +45,8 @@ export class TaskController {
     }
 
     async create(request: Request, response: Response): Promise<void> {
-        const createTaskDTO = CreateTaskRequestDTOAdapter.convert(request.body);
+        const taskRequestBody = request.body as CreateTaskRequestBody;
+        const createTaskDTO = CreateTaskRequestDTOAdapter.convert(taskRequestBody, taskRequestBody.user_id);
         const createdTask = await this.taskService.create(createTaskDTO)
 
         response.status(201).send(createdTask);

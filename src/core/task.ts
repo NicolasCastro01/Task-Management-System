@@ -9,26 +9,30 @@ interface TaskProps {
     finishAt: Date;
 }
 
-interface CreateTaskProps extends Omit<TaskProps, 'id' | 'status'> {}
+interface CreateTaskProps extends Omit<TaskProps, 'id' | 'status'> {
+    userRef: number
+}
 interface RestoreTaskProps extends TaskProps {
     id: number;
  }
 
 export class Task extends Entity<TaskProps> {
     private readonly id?: number;
+    private readonly _userRef: number;
 
-    private constructor(props: TaskProps, id?: number) {
+    private constructor(props: TaskProps, userRef: number, id?: number) {
         super(props);
         this.id = id;
+        this._userRef = userRef;
     }
 
-    static create({ title, description, finishAt }: CreateTaskProps): Task {
+    static create({ title, description, finishAt, userRef }: CreateTaskProps): Task {
         return new Task({
             title,
             description,
             status: Status.restore({ description: StatusEnum.PENDING }, 1),
             finishAt
-        });
+        }, userRef);
     }
 
     static restore({ id, title, description, status, finishAt }: RestoreTaskProps): Task {
@@ -42,6 +46,10 @@ export class Task extends Entity<TaskProps> {
 
     get _id(): number {
         return Number(this.id);
+    }
+
+    get userRef(): number {
+        return Number(this._userRef);
     }
 
     get title(): string {
