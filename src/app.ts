@@ -23,8 +23,3 @@ app.listen(port, () => {
     console.clear();
     console.log('[⚙️] > Server on!');
 });
-
-// Authentication
-// [x] - Modelar usuário no prisma
-// [x] - Criar sistema de cadastro
-// [x] - Criar sistema de login
