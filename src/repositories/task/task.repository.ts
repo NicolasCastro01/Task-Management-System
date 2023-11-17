@@ -58,7 +58,7 @@ export class TaskRepository implements TaskRepositoryContract {
     return TaskFromPrismaAdapter.convert(task);
   }
 
-  async create({ title, description, _status, finishAt }: Task): Promise<Task> {
+  async create({ title, description, _status, finishAt, userRef }: Task): Promise<Task> {
     const taskCreated = await this.database.task.create({
       data: {
         title,
@@ -68,7 +68,12 @@ export class TaskRepository implements TaskRepositoryContract {
             id: _status._id
           }
         },
-        finishAt
+        finishAt,
+        user: {
+          connect: {
+            id: userRef
+          }
+        }
       },
       include: {
         status: true
