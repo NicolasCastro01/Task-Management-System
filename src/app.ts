@@ -1,5 +1,6 @@
 import 'express-async-errors';
 import express from "express";
+import cors from "cors";
 import cookieParser from "cookie-parser";
 import TaskRoute from "~/routes/task/task.route";
 import AuthRoute from "~/routes/auth/auth.route";
@@ -9,6 +10,9 @@ import { AuthMiddleware } from './middleware/auth/auth.middleware';
 const app: express.Application = express();
 const port: number = Number(process.env.PORT) || 3000;
 
+app.use(cors({
+    origin: '*'
+}));
 app.use(cookieParser());
 app.use(express.json());
 
