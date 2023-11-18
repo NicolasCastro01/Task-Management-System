@@ -1,12 +1,13 @@
 import jwt, { DecodeOptions, JwtPayload, SignOptions } from "jsonwebtoken";
 import dotenv from "dotenv";
+import { JWT_SECRET } from "~/config/app";
 dotenv.config();
 
 export class JwtService  {
     protected readonly secretOrPrivateKey: string;
 
     constructor() {
-        this.secretOrPrivateKey = process.env.JWT_SECRET ?? '';
+        this.secretOrPrivateKey = JWT_SECRET;
      }
 
     async verify(token: string): Promise<string | JwtPayload> {

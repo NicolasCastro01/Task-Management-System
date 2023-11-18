@@ -17,5 +17,6 @@ const authController = new AuthController(jwtService, userService);
 
 router.post('/login', async (request: Request, response: Response) => authController.login(request, response));
 router.post('/register', async (request: Request, response: Response) => authController.register(request, response));
+router.post('/refresh-token', async (request: Request, response: Response) => authController.refreshToken(request, response));
 
 export default router;

@@ -3,6 +3,7 @@ import { UserService as UserServiceContract } from "~/contracts/services/user/us
 import { User } from "~/core/user";
 import { CredentialsToRegisterDTO } from "~/dtos/auth/auth";
 import * as bcrypt from "bcrypt";
+import { SALT } from "~/config/app";
 
 export class UserService implements UserServiceContract {
     constructor(
@@ -18,14 +19,12 @@ export class UserService implements UserServiceContract {
             firstName,
             lastName,
             email,
-            password: await bcrypt.hash(password, Number(process.env.SALT))
+            password: await bcrypt.hash(password, SALT)
         });
 
         await this.userRepository.create(user);
     }
-
     
-
     async findByEmail(email: string): Promise<any> {
         return this.userRepository.findByEmail(email);
     }
