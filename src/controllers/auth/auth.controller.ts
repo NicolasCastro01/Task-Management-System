@@ -4,6 +4,7 @@ import * as bcrypt from "bcrypt";
 import { ValidationException } from "~/exception/ValidationException";
 import { Request, Response } from "express";
 import { Credentials, CredentialsDTO, CredentialsToRegisterDTO } from "~/dtos/auth/auth";
+import { EXPIRES_IN, EXPIRES_IN_REFRESH_TOKEN } from "~/config/app";
 
 export class AuthController {
     constructor(
@@ -16,13 +17,15 @@ export class AuthController {
         const user = await this.userService.findByEmail(email);
         const isValidPassword = bcrypt.compareSync(password, user._props.password);
         
-        if(!isValidPassword) {
+
+        if (!isValidPassword) {
             throw ValidationException.invalid({ field: 'password', rule: 'invalid' });
         }
 
-        const token = await this.jwtService.sign({ sub: user.id }, { expiresIn: '3600s' });
-        
-        response.status(200).send({ auth_token: token });
+        const token = await this.jwtService.sign({ sub: user.id }, { expiresIn: EXPIRES_IN });
+        const refreshToken = await this.jwtService.sign({ sub: user.id }, { expiresIn: EXPIRES_IN_REFRESH_TOKEN });
+
+        response.status(200).cookie('refreshToken', refreshToken, { httpOnly: true, sameSite: 'strict' }).send({ auth_token: token });
     }
 
     async register(request: Request, response: Response): Promise<void> {
@@ -32,5 +35,21 @@ export class AuthController {
         await this.userService.create(credentialsDTO);
 
         response.status(201).send();
+    }
+
+    async refreshToken(request: Request, response: Response): Promise<void> {
+        const refreshToken = request.cookies['refreshToken'];
+        if (!refreshToken) {
+            throw ValidationException.invalid({ field: 'refreshToken', rule: 'no provided.' })
+        }
+
+        try {
+            const decoded = await this.jwtService.verify(refreshToken);
+            const accessToken = await this.jwtService.sign({ sub: decoded.sub }, { expiresIn: EXPIRES_IN });
+
+            response.send({ auth_token: accessToken });
+        } catch (error) {
+            throw ValidationException.invalid({ field: 'refreshToken', rule: 'invalid.' })
+        }
     }
 }
