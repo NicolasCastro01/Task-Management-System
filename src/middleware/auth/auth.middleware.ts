@@ -11,15 +11,14 @@ export class AuthMiddleware {
     static async init(request: Request, response: Response, next: NextFunction): Promise<void> {
         const jwtService = new JwtService();
         const authorization = request.headers['authorization'];
-        const refreshToken = request.cookies['refreshToken'];
-        
-        if(!authorization) {
+
+        if (!authorization) {
             throw ValidationException.invalid({ field: 'token', rule: 'invalid' });
         }
-        
+
         const [prefix, token] = authorization.split(' ');
-        
-        if(!token) {
+
+        if (!token) {
             throw ValidationException.invalid({ field: 'token', rule: 'missing' });
         }
 
@@ -28,20 +27,7 @@ export class AuthMiddleware {
 
             next();
         } catch (error) {
-            if(!refreshToken) {
-                throw ValidationException.invalid({ field: 'token', rule: 'invalid' });
-            }
-
-            try {
-                const decoded = await jwtService.verify(refreshToken);
-                const accessToken = await jwtService.sign({ sub: decoded.sub }, { expiresIn: EXPIRES_IN });
-          
-                response
-                  .cookie('refreshToken', refreshToken, { httpOnly: true, sameSite: 'strict' })
-                  .send({ auth_token: accessToken });
-              } catch (error) {
-                throw ValidationException.invalid({ field: 'refreshToken', rule: 'invalid' });
-              }
+            throw ValidationException.invalid({ field: 'token', rule: 'invalid' });
         }
     }
 }
