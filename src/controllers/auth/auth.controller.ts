@@ -5,6 +5,7 @@ import { ValidationException } from "~/exception/ValidationException";
 import { Request, Response } from "express";
 import { Credentials, CredentialsDTO, CredentialsToRegisterDTO } from "~/dtos/auth/auth";
 import { EXPIRES_IN, EXPIRES_IN_REFRESH_TOKEN } from "~/config/app";
+import { AuthorizationException } from "~/exception/AuthorizationException";
 
 export class AuthController {
     constructor(
@@ -49,7 +50,7 @@ export class AuthController {
 
             response.send({ auth_token: accessToken });
         } catch (error) {
-            throw ValidationException.invalid({ field: 'refreshToken', rule: 'invalid.' })
+            throw AuthorizationException.forbidden();
         }
     }
 }
