@@ -1,5 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { EXPIRES_IN } from "~/config/app";
+import { AuthenticationException } from "~/exception/AuthenticationException";
+import { AuthorizationException } from "~/exception/AuthorizationException";
 import { ValidationException } from "~/exception/ValidationException";
 import { JwtService } from "~/services/Jwt/jwt.service";
 
@@ -13,13 +15,13 @@ export class AuthMiddleware {
         const authorization = request.headers['authorization'];
 
         if (!authorization) {
-            throw ValidationException.invalid({ field: 'token', rule: 'invalid' });
+            throw ValidationException.invalid({ field: 'token', rule: 'invalidFormat' });
         }
 
         const [prefix, token] = authorization.split(' ');
 
         if (!token) {
-            throw ValidationException.invalid({ field: 'token', rule: 'missing' });
+            throw AuthenticationException.unauthorized();
         }
 
         try {
@@ -27,7 +29,7 @@ export class AuthMiddleware {
 
             next();
         } catch (error) {
-            throw ValidationException.invalid({ field: 'token', rule: 'invalid' });
+            throw AuthorizationException.forbidden();
         }
     }
 }
