@@ -1,7 +1,7 @@
 import { ApiError } from "~/helper/api-error/api-error";
 
-export class Exception<T> extends ApiError {
-    private readonly _details: (T | null)[];
+export class Exception<T = null> extends ApiError {
+    private readonly _details: T[];
 
     constructor(message: string, statusCode: number) {
         super(message, statusCode)
@@ -12,7 +12,7 @@ export class Exception<T> extends ApiError {
         this._details.push(detail);
     }
 
-    get getDetails(): (T | null)[] {
+    get getDetails(): T[] {
         return this._details;
     }
 }
