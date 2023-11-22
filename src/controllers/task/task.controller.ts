@@ -4,10 +4,13 @@ import { CreateTaskRequestBody, CreateTaskRequestDTOAdapter } from "~/adapters/r
 import { UpdateTaskRequestAdapter } from "~/adapters/request/task/updateTaskRequestAdapter";
 import { TaskService } from "~/contracts/services/task/task.service";
 import { ValidationException } from "~/exception/ValidationException";
+import { JwtService } from "~/contracts/services/jwt/jwt.service";
+import { AuthorizationException } from "~/exception/AuthorizationException";
 
 export class TaskController {
     constructor(
-        private readonly taskService: TaskService
+        private readonly taskService: TaskService,
+        private readonly jwtService: JwtService
     ) { }
 
     async getById(request: Request, response: Response): Promise<Response<Task, Record<string, Task>>> {
@@ -45,8 +48,9 @@ export class TaskController {
     }
 
     async create(request: Request, response: Response): Promise<void> {
+        const userId = await this.getUserIdFromToken(request);
         const taskRequestBody = request.body as CreateTaskRequestBody;
-        const createTaskDTO = CreateTaskRequestDTOAdapter.convert(taskRequestBody, taskRequestBody.user_id);
+        const createTaskDTO = CreateTaskRequestDTOAdapter.convert(taskRequestBody, userId);
         const createdTask = await this.taskService.create(createTaskDTO)
 
         response.status(201).send(createdTask);
@@ -61,6 +65,7 @@ export class TaskController {
     }
     
     async update(request: Request, response: Response): Promise<void> {
+        const userId = await this.getUserIdFromToken(request);
         const taskId = this.getTaskIdFromParams(request);
         const hasNotTaskId = !Boolean(taskId);
         
@@ -70,7 +75,7 @@ export class TaskController {
 
         const updatedTask = UpdateTaskRequestAdapter.convert(request.body, taskId);
             
-        await this.taskService.update(updatedTask);
+        await this.taskService.update(updatedTask, userId);
         
         response.status(200).send();
     }
@@ -90,5 +95,18 @@ export class TaskController {
 
     private getTaskIdFromParams(request: Request): number {
         return Number(request.params.taskId);
+    }
+
+    private async getUserIdFromToken(request: Request): Promise<number> {
+        const token = request.headers.authorization?.split(' ')[1];
+
+        if(!token) {
+            throw AuthorizationException.forbidden();
+        }
+
+        const decoded = await this.jwtService.decode(token);
+        const userId = Number(decoded?.sub);
+
+        return userId;
     }
 }
