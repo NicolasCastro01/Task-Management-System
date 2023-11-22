@@ -26,7 +26,7 @@ export class TaskService implements TaskServiceContract {
     async create(createTaskRequestBody: CreateTaskRequestDTO): Promise<Task> {
         await this.userRepository.findById(createTaskRequestBody.userRef);
         
-        const task = Task.create(createTaskRequestBody);
+        const task = Task.create(createTaskRequestBody, createTaskRequestBody.userRef);
 
         return this.taskRepository.create(task);
     }
@@ -42,7 +42,7 @@ export class TaskService implements TaskServiceContract {
         return false;
     }
 
-    async update(updatedTask: UpdateTaskRequestDTO): Promise<void> {
+    async update(updatedTask: UpdateTaskRequestDTO, userRef: number): Promise<void> {
         const task = await this.findById(updatedTask.id);
         const taskUpdated = Task.restore({
             id: task._id,
@@ -50,7 +50,7 @@ export class TaskService implements TaskServiceContract {
             description: updatedTask.description || task.description,
             status: task._status,
             finishAt: updatedTask.finish_at || task.finishAt
-        });
+        }, userRef);
 
         await this.taskRepository.update(taskUpdated, task._id);
     }
