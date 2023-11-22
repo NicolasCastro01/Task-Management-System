@@ -8,6 +8,6 @@ export interface TaskService {
     getAllByFilter(filter: FiltersEnum, value: string): Promise<Task[]>;
     create(createTaskRequestBody: CreateTaskRequestDTO): Promise<Task>;
     delete(taskId: number): Promise<boolean>;
-    update(updatedTask: UpdateTaskRequestDTO): Promise<void>;
+    update(updatedTask: UpdateTaskRequestDTO, userRef: number): Promise<void>;
     complete(taskId: number): Promise<void>;
 }

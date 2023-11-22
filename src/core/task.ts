@@ -3,18 +3,15 @@ import { Status } from "./status";
 import { Entity } from "~/common/core/entity/entity";
 
 interface TaskProps {
+    id?: number;
     title: string;
     description: string;
     status: Status;
     finishAt: Date;
 }
 
-interface CreateTaskProps extends Omit<TaskProps, 'id' | 'status'> {
-    userRef: number
-}
-interface RestoreTaskProps extends TaskProps {
-    id: number;
- }
+interface CreateTaskProps extends Omit<TaskProps, 'id' | 'status'> { }
+interface RestoreTaskProps extends TaskProps { }
 
 export class Task extends Entity<TaskProps> {
     private readonly id?: number;
@@ -26,7 +23,7 @@ export class Task extends Entity<TaskProps> {
         this._userRef = userRef;
     }
 
-    static create({ title, description, finishAt, userRef }: CreateTaskProps): Task {
+    static create({ title, description, finishAt }: CreateTaskProps, userRef: number): Task {
         return new Task({
             title,
             description,
@@ -35,13 +32,13 @@ export class Task extends Entity<TaskProps> {
         }, userRef);
     }
 
-    static restore({ id, title, description, status, finishAt }: RestoreTaskProps): Task {
+    static restore({ id, title, description, status, finishAt }: RestoreTaskProps, userRef: number): Task {
         return new Task({
             title,
             description,
             status: Status.restore({ description: status._props.description }, status._id),
             finishAt
-        }, id);
+        }, userRef, id);
     }
 
     get _id(): number {

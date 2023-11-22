@@ -1,9 +1,10 @@
 import jwt, { DecodeOptions, JwtPayload, SignOptions } from "jsonwebtoken";
-import dotenv from "dotenv";
 import { JWT_SECRET } from "~/config/app";
+import { JwtService as JwtServiceContract } from "~/contracts/services/jwt/jwt.service";
+import dotenv from "dotenv";
 dotenv.config();
 
-export class JwtService  {
+export class JwtService implements JwtServiceContract  {
     protected readonly secretOrPrivateKey: string;
 
     constructor() {

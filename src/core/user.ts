@@ -1,4 +1,5 @@
 import { Entity } from "~/common/core/entity/entity";
+import { Task } from "./task";
 
 interface UserProps {
     id?: number;
@@ -6,9 +7,10 @@ interface UserProps {
     lastName: string;
     email: string;
     password: string;
+    tasks: Task[];
 }
 
-interface CreateUserProps extends UserProps { }
+interface CreateUserProps extends Omit<UserProps, "tasks"> { }
 interface RestoreUserProps extends UserProps { }
 
 export class User extends Entity<UserProps> {
@@ -20,7 +22,10 @@ export class User extends Entity<UserProps> {
     }
 
     static create(props: CreateUserProps): User {
-        return new User(props);
+        return new User({
+            ...props,
+            tasks: []
+        });
     }
 
     static restore(props: RestoreUserProps, id: number): User {

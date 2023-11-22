@@ -4,7 +4,6 @@ export interface CreateTaskRequestBody {
     title: string;
     description: string;
     finish_at: string;
-    user_id: number;
 }
 
 export class CreateTaskRequestDTOAdapter {
