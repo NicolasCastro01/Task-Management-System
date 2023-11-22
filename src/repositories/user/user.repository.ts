@@ -10,8 +10,8 @@ export class UserRepository implements UserRepositoryContract {
     ) { }
 
     async findById(userId: number): Promise<User> {
-        const user = await this.prismaClient.user.findUnique({ where: { id: userId } });
-
+        const user = await this.prismaClient.user.findUnique({ where: { id: userId }, include: { Task: { include: { status: true } } } });
+        
         if(!user) {
             throw ResourceException.notFound({ field: 'user' });
         }
@@ -31,9 +31,7 @@ export class UserRepository implements UserRepositoryContract {
     }
     
     async findByEmail(email: string): Promise<User>{
-        const user = await this.prismaClient.user.findUnique({
-            where: { email }
-        });
+        const user = await this.prismaClient.user.findUnique({ where: { email }, include: { Task: { include: { status: true } } }});
 
         if(!user) {
             throw ResourceException.notFound({ field: 'user' });
