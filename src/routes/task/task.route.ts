@@ -4,6 +4,7 @@ import { TaskController } from "@controllers/task/task.controller";
 import { TaskService } from "~/services/task/task.service";
 import { TaskRepository } from "~/repositories/task/task.repository";
 import { UserRepository } from "~/repositories/user/user.repository";
+import { JwtService } from "~/services/Jwt/jwt.service";
 
 const express = require("express");
 const router = express.Router();
@@ -12,8 +13,9 @@ const database = new PrismaClient();
 
 const taskRepository = new TaskRepository(database);
 const userRepository = new UserRepository(database);
+const jwtService = new JwtService();
 const taskService = new TaskService(taskRepository, userRepository);
-const taskController = new TaskController(taskService);
+const taskController = new TaskController(taskService, jwtService);
 
 router.get('/', async (request: Request, response: Response) => taskController.getAll(request, response)); 
 router.get('/:taskId', async (request: Request, response: Response) => taskController.getById(request, response)); 
