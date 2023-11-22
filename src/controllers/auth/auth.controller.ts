@@ -1,11 +1,11 @@
 import { UserService } from "~/contracts/services/user/user.service";
-import { JwtService } from "~/services/Jwt/jwt.service";
 import * as bcrypt from "bcrypt";
 import { ValidationException } from "~/exception/ValidationException";
 import { Request, Response } from "express";
 import { Credentials, CredentialsDTO, CredentialsToRegisterDTO } from "~/dtos/auth/auth";
 import { EXPIRES_IN, EXPIRES_IN_REFRESH_TOKEN } from "~/config/app";
 import { AuthorizationException } from "~/exception/AuthorizationException";
+import { JwtService } from "~/contracts/services/jwt/jwt.service";
 
 export class AuthController {
     constructor(
