@@ -20,6 +20,19 @@ export class TaskRepository implements TaskRepositoryContract {
     return tasks.map(TaskFromPrismaAdapter.convert);
   }
 
+  async getAllByUserId(userId: number): Promise<Task[]> {
+    const tasks = await this.database.task.findMany({
+      where: {
+        userId
+      },
+      include: {
+        status: true
+      }
+    });
+
+    return tasks.map(TaskFromPrismaAdapter.convert);
+  }
+
   async getAllByFilter(filter: FiltersEnum, value: string | number): Promise<Task[]> {
     const isDate = FiltersEnum[filter] === FiltersEnum.finishAt;
     const valueParsed = value.toString();

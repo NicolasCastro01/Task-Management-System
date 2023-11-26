@@ -3,6 +3,7 @@ import { FiltersEnum } from "~/enum/task/filters";
 
 export interface TaskRepository {
     getAll(): Promise<Task[]>;
+    getAllByUserId(userId: number): Promise<Task[]>;
     getAllByFilter(filter: FiltersEnum, value: string): Promise<Task[]>;
     findById(taskId: number): Promise<Task>;
     create(task: Task): Promise<Task>;
