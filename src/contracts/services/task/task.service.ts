@@ -4,6 +4,7 @@ import { FiltersEnum } from "~/enum/task/filters";
 
 export interface TaskService { 
     getAll(): Promise<Task[]>;
+    getAllByUserId(userId: number): Promise<Task[]>;
     findById(taskId: number): Promise<Task>;
     getAllByFilter(filter: FiltersEnum, value: string): Promise<Task[]>;
     create(createTaskRequestBody: CreateTaskRequestDTO): Promise<Task>;

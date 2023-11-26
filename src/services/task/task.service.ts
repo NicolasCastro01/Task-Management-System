@@ -15,6 +15,10 @@ export class TaskService implements TaskServiceContract {
         return this.taskRepository.getAll();
     }
 
+    async getAllByUserId(userId: number): Promise<Task[]> {
+        return this.taskRepository.getAllByUserId(userId);
+    }
+
     async findById(taskId: number): Promise<Task> {
         return this.taskRepository.findById(taskId);
     }
