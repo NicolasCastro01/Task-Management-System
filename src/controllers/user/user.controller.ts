@@ -18,7 +18,7 @@ export class UserController {
 
         const decoded = await this.jwtService.decode(token);
         const userId = Number(decoded?.sub);
-        const {_props: { password, ...user }} = await this.userService.findById(userId);        
+        const {_props: { password, tasks, ...user }} = await this.userService.findById(userId);        
 
         response.status(200).send(user);
     }
