@@ -23,6 +23,6 @@ router.get('/list', async (request: Request, response: Response) => taskControll
 router.post('/create', async (request: Request, response: Response) => taskController.create(request, response));
 router.patch('/:taskId/edit', async (request: Request, response: Response) => taskController.update(request, response));
 router.patch('/:taskId/complete', async (request: Request, response: Response) => taskController.complete(request, response));
-router.delete('/:taskId/delete', async (request: Request, response: Response) => taskController.delete(request, response));
+router.delete('/:taskId', async (request: Request, response: Response) => taskController.delete(request, response));
 
 export default router;
