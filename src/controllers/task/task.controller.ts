@@ -22,7 +22,7 @@ export class TaskController {
     async getAll(request: Request, response: Response): Promise<Response<Task[], Record<string, Task>>>{
         const userId = await this.getUserIdFromToken(request);
         const tasks = await this.taskService.getAllByUserId(userId);
-        return response.status(200).send(tasks.map(task => task._props));
+        return response.status(200).send(tasks);
     }
 
     async getAllByFilter(request: Request, response: Response): Promise<Response<Task[], Record<string, Task>>> {
