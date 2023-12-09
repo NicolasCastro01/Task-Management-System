@@ -26,4 +26,8 @@ export class Status extends Entity<StatusProps> {
     get _id(): number {
         return Number(this.id);
     }
+
+    get _props(): StatusProps {
+        return this.props;
+    }
 }
